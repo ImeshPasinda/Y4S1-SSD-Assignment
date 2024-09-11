@@ -30,7 +30,29 @@ import {
   USER_UPDATE_PROFILE_SUCCESS,
   USER_UPDATE_REQUEST,
   USER_UPDATE_SUCCESS,
+  USER_GOOGLE_LOGIN_REQUEST,
+  USER_GOOGLE_LOGIN_SUCCESS,
+  USER_GOOGLE_LOGIN_FAIL,
 } from '../constants/userConstants';
+
+// Google Login action
+export const googleLogin = (idToken) => async (dispatch) => {
+  try {
+    dispatch({ type: USER_GOOGLE_LOGIN_REQUEST });
+
+    const config = { headers: { 'Content-Type': 'application/json' } };
+    const { data } = await axios.post('/api/users/google-login', { idToken }, config);
+
+    dispatch({ type: USER_GOOGLE_LOGIN_SUCCESS, payload: data });
+    localStorage.setItem('userInfo', JSON.stringify(data));
+    window.location.reload();
+  } catch (error) {
+    dispatch({
+      type: USER_GOOGLE_LOGIN_FAIL,
+      payload: error.response?.data.message || error.message,
+    });
+  }
+};
 
 export const login = (email, password) => async (dispatch) => {
   try {

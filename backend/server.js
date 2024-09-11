@@ -17,13 +17,16 @@ connectDB();
 
 const app = express();
 
+// Body parser
 app.use(express.json());
 
+// Routes
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
 
+// PayPal Config
 app.get('/api/config/paypal', (req, res) =>
   res.send(process.env.PAYPAL_CLIENT_ID)
 );
@@ -31,6 +34,7 @@ app.get('/api/config/paypal', (req, res) =>
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
+// Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '/frontend/build')));
 
@@ -43,6 +47,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Error Handling Middleware
 app.use(notFound);
 app.use(errorHandler);
 
