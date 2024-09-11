@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid'; // Import UUID for generating random values
 
 const userSchema = mongoose.Schema(
   {
@@ -14,7 +15,9 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+    },
+    googleId: {
+      type: String,
     },
     isAdmin: {
       type: Boolean,
@@ -36,8 +39,17 @@ userSchema.pre('save', async function (next) {
     next();
   }
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  if (this.password) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
+
+  // Generate a random value for googleId if it's null
+  if (!this.googleId) {
+    this.googleId = uuidv4(); // Generate a unique random ID
+  }
+
+  next();
 });
 
 const User = mongoose.model('User', userSchema);

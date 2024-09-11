@@ -22,6 +22,7 @@ import { snackBarReducer } from './reducers/snackbarReducers';
 import {
   userDeleteReducer,
   userDetailsReducer,
+  userGoogleLoginReducer,
   userListReducer,
   userLoginReducer,
   userRegisterReducer,
@@ -38,6 +39,7 @@ const reducer = combineReducers({
   cart: cartReducer,
   userLogin: userLoginReducer,
   userRegister: userRegisterReducer,
+  userGoogleLogin: userGoogleLoginReducer,
   userDetails: userDetailsReducer,
   userUpdateProfile: userUpdateProfileReducer,
   userList: userListReducer,
