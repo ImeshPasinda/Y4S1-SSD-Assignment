@@ -31,10 +31,5 @@
   "devDependencies": {
     "concurrently": "^5.3.0",
     "nodemon": "^2.0.22"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
   }
 }
