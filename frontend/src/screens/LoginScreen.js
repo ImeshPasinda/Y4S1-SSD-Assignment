@@ -2,8 +2,9 @@ import { Button, Grid, makeStyles, TextField, Typography } from '@material-ui/co
 import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'; // Import Google login components
 
-import { login } from '../actions/userActions';
+import { login, googleLogin } from '../actions/userActions'; // Import googleLogin action
 import FormContainer from '../components/FormContainer';
 import PasswordInput from '../components/inputs/PasswordInput';
 import Loader from '../components/Loader';
@@ -46,11 +47,20 @@ const LoginScreen = ({ location, history }) => {
     dispatch(login(email, password));
   };
 
+  const handleGoogleSuccess = async (response) => {
+    const { credential } = response;
+    await dispatch(googleLogin(credential));
+  };
+
+  const handleGoogleFailure = (error) => {
+    console.error('Google login failed:', error);
+  };
+
   return (
     <FormContainer>
       {loading && <Loader open={loading} />}
       <form className={classes.root} autoComplete="off">
-        <Typography variant="h5" style={{ marginTop: '25px', textAlign: 'center' ,color:'#4682B4'}}>
+        <Typography variant="h5" style={{ marginTop: '25px', textAlign: 'center', color: '#4682B4' }}>
           SIGN IN
         </Typography>
         <TextField
@@ -72,21 +82,30 @@ const LoginScreen = ({ location, history }) => {
         {error && <Message severity="error">{error}</Message>}
         <Button
           variant="contained"
-          width="100px"
-          style={{color:'#8FBC8B'}}
+          style={{ color: '#8FBC8B' }}
           onClick={submitHandler}
           disabled={btnSubmitIsDisabled}
           type="submit"
         >
           <b>Sign In</b>
         </Button>
+
+        {/* Google Login Button */}
+        <Grid container justify="center" style={{ paddingTop: '10px' }}>
+          <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onFailure={handleGoogleFailure}
+              buttonText="Login with Google"
+              className={classes.googleButton}
+            />
+          </GoogleOAuthProvider>
+        </Grid>
+
         <Grid item style={{ textAlign: 'center', paddingTop: '5px' }}>
           New Customer?
           <span>
-            <Link
-              style={{ textDecoration: 'none', color:'#4682B4'}}
-              to={redirect ? `/register?redirect=${redirect}` : '/register'}
-            >
+            <Link style={{ textDecoration: 'none', color: '#4682B4' }} to={redirect ? `/register?redirect=${redirect}` : '/register'}>
               {' '}
               Register
             </Link>

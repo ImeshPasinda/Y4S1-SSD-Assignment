@@ -1,7 +1,12 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
+import { OAuth2Client } from 'google-auth-library';
+import dotenv from 'dotenv';
 
+dotenv.config();
+// Initialize Google Auth client
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
@@ -41,6 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     email,
     password,
+    googleId: null,
   });
 
   if (user) {
@@ -166,6 +172,53 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Google Login
+// @route   POST /api/users/google-login
+// @access  Public
+const googleLogin = asyncHandler(async (req, res) => {
+  const { idToken } = req.body;
+
+  try {
+    // Verify the ID token using Google client
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const { sub, name, email } = ticket.getPayload();
+
+    // Check if user already exists
+    let user = await User.findOne({ googleId: sub });
+    if (user) {
+      // User exists, return user info and token
+      res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
+      });
+    } else {
+      // Create a new user if not found
+      user = new User({
+        name,
+        email,
+        googleId: sub,
+      });
+      const savedUser = await user.save();
+      res.status(201).json({
+        _id: savedUser._id,
+        name: savedUser.name,
+        email: savedUser.email,
+        isAdmin: savedUser.isAdmin,
+        token: generateToken(savedUser._id),
+      });
+    }
+  } catch (error) {
+    // Handle errors related to token verification or user creation
+    res.status(400).json({ message: 'Invalid Google token or error processing request' });
+  }
+});
+
 export {
   authUser,
   registerUser,
@@ -175,4 +228,5 @@ export {
   deleteUser,
   getUserById,
   updateUser,
+  googleLogin
 };
