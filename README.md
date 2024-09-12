@@ -4,6 +4,10 @@
 
 Applied comprehensive security patches to this code base, improving the overall system's security by addressing vulnerabilities and implementing best practices for safer and more robust code.
 
+## Repository
+
+This project is based on the repository located at [https://github.com/ChathukaHeshan/SPM](https://github.com/ChathukaHeshan/SPM). We have applied significant security updates to the original code base to enhance its security.
+
 ## Updates
 
 ### Security Patches
