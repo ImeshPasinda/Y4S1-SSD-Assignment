@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser'
 import csurf from 'csurf';
 import colors from 'colors';
+import cors from 'cors';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
 
@@ -19,31 +20,11 @@ connectDB();
 
 const app = express();
 
-// const cookieParser = require('cookie-parser');
-// const csrf = require('csurf');
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 
-app.use(cookieParser());
-
-// Use csurf middleware to generate and verify CSRF tokens
-// const csrfProtection = csrf({ cookie: true });
-
-// Apply CSRF protection to all routes that require it
-app.use(csurf({ cookie: true }))
-
-// Include the CSRF token in response locals
-app.use((req, res, next) => {
-  res.locals.csrfToken = req.csrfToken();
-  next();
-});
-// CSRF Protection Middleware (csrf token is stored in a cookie)
-const csrfProtection = csurf({ cookie: true });
-app.use(csrfProtection);
-
-// Set CSRF token in response cookie
-app.use((req, res, next) => {
-  res.cookie('_csrf', req.csrfToken(), { httpOnly: true ,sameSite: 'Strict'});
-  next();
-});
 // Body parser
 app.use(express.json());
 
