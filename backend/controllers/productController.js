@@ -1,15 +1,9 @@
 import asyncHandler from 'express-async-handler';
 import Product from '../models/productModel.js';
 
-// @desc    Fetch all products
-// @route   GET /api/products
-// @access  Public
+
 const getProducts = asyncHandler(async (req, res) => {
-  console.log(req.headers['x-csrf-token']);
-  console.log(req.csrfToken())
- if (req.csrfToken() !== req.headers['x-csrf-token']) {
-    return res.status(403).json({ message: 'CSRF Token Invalid' });
-  }
+ 
   const pageSize = 8;
   const page = Number(req.query.pageNumber) || 1;
 
@@ -30,13 +24,8 @@ const getProducts = asyncHandler(async (req, res) => {
   res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
 
-// @desc    Fetch single product
-// @route   GET /api/products/:id
-// @access  Public
 const getProductById = asyncHandler(async (req, res) => {
-  if (req.csrfToken() !== req.headers['x-csrf-token']) {
-    return res.status(403).json({ message: 'CSRF Token Invalid' });
-  }
+ 
   const product = await Product.findById(req.params.id);
 
   if (product) {
@@ -47,13 +36,8 @@ const getProductById = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Delete a product
-// @route   DELETE /api/products/:id
-// @access  Private/Admin
 const deleteProduct = asyncHandler(async (req, res) => {
-  if (req.csrfToken() !== req.headers['x-csrf-token']) {
-    return res.status(403).json({ message: 'CSRF Token Invalid' });
-  }
+ 
   const product = await Product.findById(req.params.id);
 
   if (product) {
@@ -65,13 +49,9 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Create a product
-// @route   POST /api/products
-// @access  Private/Admin
+
 const createProduct = asyncHandler(async (req, res) => {
-  if (req.csrfToken() !== req.headers['x-csrf-token']) {
-    return res.status(403).json({ message: 'CSRF Token Invalid' });
-  }
+  
   const product = new Product({
     name: 'Sample name',
     price: 0,
@@ -88,13 +68,8 @@ const createProduct = asyncHandler(async (req, res) => {
   res.status(201).json(createdProduct);
 });
 
-// @desc    Update a product
-// @route   PUT /api/products/:id
-// @access  Private/Admin
 const updateProduct = asyncHandler(async (req, res) => {
-  if (req.csrfToken() !== req.headers['x-csrf-token']) {
-    return res.status(403).json({ message: 'CSRF Token Invalid' });
-  }
+  
   const {
     name,
     price,
