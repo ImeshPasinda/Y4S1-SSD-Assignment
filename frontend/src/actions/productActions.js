@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 import {
   PRODUCT_CREATE_FAIL,
@@ -23,17 +24,33 @@ export const listProducts = (keyword = '', pageNumber = '') => async (dispatch) 
   try {
     dispatch({ type: PRODUCT_LIST_REQUEST });
 
-    const { data } = await axios.get(`/api/products?keyword=${keyword}&pageNumber=${pageNumber}`);
+    // Get CSRF token from cookies (or wherever it's stored)
+    const csrfToken = Cookies.get('_csrf'); // Assuming token is in cookies
 
+    console.log(csrfToken)
+    const config = {
+      headers: {
+        'x-csrf-token': csrfToken, // Include CSRF token in headers
+      },
+      withCredentials: true, // Ensure cookies are sent with the request
+    };
+
+    // Make API request with keyword and pageNumber
+    const { data } = await axios.get(`/api/products?keyword=${keyword}&pageNumber=${pageNumber}`, config);
+
+    // Dispatch success action and pass the response data
     dispatch({
       type: PRODUCT_LIST_SUCCESS,
       payload: data,
     });
   } catch (error) {
+    // Dispatch failure action and handle error message
     dispatch({
       type: PRODUCT_LIST_FAIL,
       payload:
-        error.response && error.response.data.message ? error.response.data.message : error.message,
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
     });
   }
 };
