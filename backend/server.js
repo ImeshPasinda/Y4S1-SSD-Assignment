@@ -1,5 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser'
+import csurf from 'csurf';
 import colors from 'colors';
 import cors from 'cors';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
